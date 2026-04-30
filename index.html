@@ -1,125 +1,575 @@
-from pathlib import Path
-import json, html
-
-groups = {
-"低海拔鳥點（東勢林業園區、恩光靈修營地、富山巷、橫流溪）": {
-"東勢林業園區": [
-("臺灣竹雞","2026/4/25",1),("金背鳩","2026/4/25",2),("紅鳩","2026/4/25",1),("珠頸斑鳩","2026/4/25",2),
-("紅冠水雞","2026/4/25",3),("小鸊鷉","2026/4/25",4),("夜鷺","2026/4/25",5),("黑冠麻鷺","2026/4/25",2),
-("黃頭鷺","2026/4/25",6),("翠鳥","2026/4/25",1),("五色鳥","2026/4/25",1),("大卷尾","2026/4/25",2),
-("樹鵲","2026/4/25",4),("褐頭鷦鶯","2026/4/25",1),("家燕","2026/4/25",20),("東方金腰燕","2026/4/25",13),
-("紅嘴黑鵯","2026/4/25",11),("白頭翁","2026/4/25",10),("斯氏繡眼（綠繡眼）","2026/4/25",8),("家八哥","2026/4/25",2),
-("白尾八哥","2026/4/25",6),("鵲鴝","2026/4/25",1),("白腰鵲鴝","2026/4/25",1),("灰鶺鴒","2026/4/25",1),
-("白鶺鴒","2026/4/25",2),("小雨燕","2026/4/23",1),("大白鷺","2026/4/23",1),("大冠鷲","2026/4/23",1),
-("松雀鷹","2026/4/23",1),("黑枕藍鶲","2026/4/23",2),("洋燕","2026/4/23",2),("麻雀","2026/4/23",4),
-("小白鷺","2026/4/22",1),("小啄木","2026/4/21",2)
-],
-"恩光靈修營地": [
-("原鴿","2026/4/29",1),("紅鳩","2026/4/29",1),("珠頸斑鳩","2026/4/29",5),("夜鷺","2026/4/29",1),
-("黃頭鷺","2026/4/29",3),("大冠鷲","2026/4/29",1),("五色鳥","2026/4/29",2),("灰喉山椒鳥","2026/4/29",2),
-("綠畫眉","2026/4/29",2),("黃鸝","2026/4/29",1),("小卷尾","2026/4/29",4),("黑枕藍鶲","2026/4/29",1),
-("樹鵲","2026/4/29",3),("家燕","2026/4/29",4),("紅嘴黑鵯","2026/4/29",4),("白環鸚嘴鵯","2026/4/29",6),
-("白頭翁","2026/4/29",8),("斯氏繡眼（綠繡眼）","2026/4/29",3),("臺灣畫眉","2026/4/29",1),("家八哥","2026/4/29",1),
-("白腰鵲鴝","2026/4/29",2),("白腰文鳥","2026/4/29",3),("麻雀","2026/4/29",3),("臺灣竹雞","2026/4/25",2),
-("小白鷺","2026/4/25",1),("松雀鷹","2026/4/25",1),("翠鳥","2026/4/25",1),("大卷尾","2026/4/25",3),
-("東方毛腳燕","2026/4/25",1),("極北柳鶯","2026/4/25",1),("小彎嘴","2026/4/25",2),("金背鳩","2026/4/24",2),
-("白腹秧雞","2026/4/24",1),("東方蜂鷹","2026/4/24",1),("朱鸝","2026/4/24",1),("山紅頭","2026/4/24",1),
-("頭烏線","2026/4/24",1),("綠啄花","2026/4/24",1),("繡眼畫眉","2026/4/20",5)
-],
-"富山巷": [
-("金背鳩","2026/4/26",1),("大冠鷲","2026/4/26",2),("鳳頭蒼鷹","2026/4/26",1),("五色鳥","2026/4/26",4),
-("灰喉山椒鳥","2026/4/26",3),("綠畫眉","2026/4/26",3),("大卷尾","2026/4/26",2),("樹鵲","2026/4/26",2),
-("巨嘴鴉","2026/4/26",1),("東方金腰燕","2026/4/26",5),("紅嘴黑鵯","2026/4/26",5),("棕面鶯","2026/4/26",2),
-("冠羽畫眉","2026/4/26",5),("斯氏繡眼（綠繡眼）","2026/4/26",1),("山紅頭","2026/4/26",1),("小彎嘴","2026/4/26",1),
-("頭烏線","2026/4/26",1),("繡眼畫眉","2026/4/26",4),("紅尾鶲","2026/4/26",1),("藍腹鷴","2026/4/24",1),
-("小雨燕","2026/4/24",2),("赤腹山雀","2026/4/24",5)
-],
-"橫流溪": [
-("北方中杜鵑","2026/4/29",1),("五色鳥","2026/4/29",2),("灰喉山椒鳥","2026/4/29",2),("赤腹山雀","2026/4/29",3),
-("紅嘴黑鵯","2026/4/29",4),("棕面鶯","2026/4/29",3),("頭烏線","2026/4/29",2),("大冠鷲","2026/4/27",3),
-("鳳頭蒼鷹","2026/4/27",1),("樹鵲","2026/4/27",3),("巨嘴鴉","2026/4/27",1),("洋燕","2026/4/27",2),
-("冠羽畫眉","2026/4/27",1),("山紅頭","2026/4/27",1),("鉛色水鶇","2026/4/27",1),("金背鳩","2026/4/26",1),
-("黑冠麻鷺","2026/4/26",1),("繡眼畫眉","2026/4/26",4),("小剪尾","2026/4/26",1),("白尾鴝","2026/4/26",1),
-("白腰文鳥","2026/4/26",6),("臺灣山鷓鴣","2026/4/24",1),("臺灣竹雞","2026/4/23",3),("灰喉針尾雨燕","2026/4/23",1),
-("小雨燕","2026/4/23",2),("東方毛腳燕","2026/4/23",4),("白耳畫眉","2026/4/21",1),("林鵰","2026/4/20",1)
-]
-},
-"中高海拔鳥點（大雪山林道、鞍馬山莊、小雪山天池）": {
-"大雪山林道 22K–23.5K": [
-("藍腹鷴","2026/4/29",2),("鷹鵑","2026/4/29",1),("冠羽畫眉","2026/4/29",10),("綠鳩","2026/4/29",1),
-("五色鳥","2026/4/29",1),("青背山雀","2026/4/28",3),("黃山雀","2026/4/28",2),("白耳畫眉","2026/4/28",4),
-("臺灣叢樹鶯","2026/4/28",1),("繡眼畫眉","2026/4/28",4),("黃腹琉璃","2026/4/27",1),("白尾鴝","2026/4/27",1),
-("黃胸青鶲","2026/4/27",1),("臺灣噪眉","2026/4/27",6),("黃胸藪眉","2026/4/27",2),("東方毛腳燕","2026/4/26",6),
-("臺灣白喉噪眉","2026/4/26",6),("紅頭山雀","2026/4/25",15),("臺灣山鷓鴣","2026/4/25",3),("臺灣紫嘯鶇","2026/4/26",1),
-("松鴉","2026/4/21",1),("棕噪眉","2026/4/21",1),("熊鷹","2026/4/20",1),("紅胸啄花","2026/4/20",1),("栗背林鴝","2026/4/21",1)
-],
-"鞍馬山莊": [
-("小啄木","2026/4/30",1),("青背山雀","2026/4/30",2),("棕面鶯","2026/4/30",2),("冠羽畫眉","2026/4/30",12),
-("白耳畫眉","2026/4/30",2),("臺灣白喉噪眉","2026/4/30",6),("黃腹琉璃","2026/4/30",1),("臺灣紫嘯鶇","2026/4/30",1),
-("巨嘴鴉","2026/4/30",1),("紅頭山雀","2026/4/30",20),("茶腹鳾","2026/4/30",2),("白尾鴝","2026/4/30",1),
-("藍腹鷴","2026/4/29",1),("黃胸藪眉","2026/4/29",1),("鷹鵑","2026/4/28",1),("黃嘴角鴞","2026/4/28",2),
-("綠啄木","2026/4/28",1),("煤山雀","2026/4/28",2),("灰林鴿","2026/4/28",1),("臺灣山鷓鴣","2026/4/27",1),
-("星鴉","2026/4/27",1),("繡眼畫眉","2026/4/27",1),("黃胸青鶲","2026/4/27",1),("五色鳥","2026/4/27",1),
-("灰喉山椒鳥","2026/4/26",1),("棕噪眉","2026/4/26",2),("黃山雀","2026/4/26",1),("松鴉","2026/4/25",1),
-("深山鶯","2026/4/25",1),("頭烏線","2026/4/25",4),("褐頭花翼","2026/4/24",1),("斯氏繡眼（綠繡眼）","2026/4/24",6),
-("大赤啄木","2026/4/21",1),("夜鷺","2026/4/20",1),("山紅頭","2026/4/20",1)
-],
-"小雪山天池": [
-("北方中杜鵑","2026/4/29",1),("青背山雀","2026/4/29",4),("臺灣叢樹鶯","2026/4/29",2),("深山鶯","2026/4/29",2),
-("紅頭山雀","2026/4/29",4),("褐頭花翼","2026/4/29",2),("冠羽畫眉","2026/4/29",10),("臺灣噪眉","2026/4/29",6),
-("紋翼畫眉","2026/4/29",6),("黃胸藪眉","2026/4/29",4),("臺灣白眉林鴝","2026/4/29",2),("栗背林鴝","2026/4/29",6),
-("煤山雀","2026/4/29",1),("大冠鷲","2026/4/28",1),("星鴉","2026/4/28",2),("臺灣鷦眉","2026/4/28",2),
-("白耳畫眉","2026/4/28",2),("黃腹琉璃","2026/4/28",1),("黃胸青鶲","2026/4/28",1),("黑長尾雉","2026/4/28",2),
-("松鴉","2026/4/28",1),("棕面鶯","2026/4/28",1),("山紅頭","2026/4/28",1),("繡眼畫眉","2026/4/28",4),
-("火冠戴菊鳥","2026/4/28",1),("巨嘴鴉","2026/4/27",1),("白尾鴝","2026/4/26",1),("小翼鶇","2026/4/26",2),
-("花雀","2026/4/26",1),("紅胸啄花","2026/4/25",1),("灰鷽","2026/4/25",2),("叉尾雨燕","2026/4/21",1),("綠啄木","2026/4/21",1)
-]
-}
-}
-
-html_text = f"""<!doctype html>
+<!doctype html>
 <html lang="zh-Hant">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>鳥點鳥種勾選表</title>
-<style>
-body {{ font-family: -apple-system, BlinkMacSystemFont, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif; margin: 24px; background:#f7f7f5; color:#222; }}
-h1 {{ margin-bottom: 6px; }}
-.note {{ margin: 0 0 18px; color:#555; }}
-.sheet {{ background:white; border:1px solid #ddd; border-radius:14px; padding:18px; margin: 22px 0; box-shadow:0 1px 6px rgba(0,0,0,.05); }}
-.grid {{ display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:16px; }}
-.spot {{ border:1px solid #e1e1e1; border-radius:12px; overflow:hidden; }}
-.spot h3 {{ margin:0; padding:10px 12px; background:#eee; font-size:18px; }}
-.row {{ display:grid; grid-template-columns: 28px 1fr 84px 26px; gap:6px; align-items:center; padding:7px 10px; border-top:1px solid #eee; }}
-.row:hover {{ background:#fafafa; }}
-.date {{ font-size:12px; color:#666; text-align:right; }}
-.star {{ font-weight:700; text-align:center; }}
-input[type="checkbox"] {{ width:18px; height:18px; }}
-@media print {{
-  body {{ background:white; margin: 10mm; }}
-  .sheet {{ break-after: page; box-shadow:none; border:none; padding:0; }}
-  .spot {{ break-inside: avoid; }}
-  input {{ appearance:none; border:1px solid #333; width:14px; height:14px; }}
-}}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1f5d3a">
+  <title>大雪山鳥點 Checklist</title>
+  <style>
+    :root {
+      --bg: #f7f3e8;
+      --card: #ffffff;
+      --ink: #172018;
+      --muted: #667064;
+      --green: #1f6f43;
+      --green-dark: #143d2a;
+      --green-soft: #e7f4eb;
+      --line: #dbe2d9;
+      --star: #b8322a;
+      --shadow: 0 8px 26px rgba(25, 45, 25, .10);
+      --radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 0% 0%, rgba(91, 145, 87, .18), transparent 32rem),
+        linear-gradient(180deg, #fbf8ef 0%, var(--bg) 100%);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+      line-height: 1.45;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      padding: 16px 14px 8px;
+      background: rgba(247, 243, 232, .94);
+      border-bottom: 1px solid rgba(115, 130, 110, .25);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+
+    .wrap {
+      width: min(1080px, 100%);
+      margin: 0 auto;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(1.45rem, 5vw, 2.3rem);
+      line-height: 1.15;
+      letter-spacing: .02em;
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      color: var(--muted);
+      font-size: .9rem;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 10px;
+      border: 1px solid rgba(115, 130, 110, .26);
+      border-radius: 999px;
+      background: rgba(255,255,255,.78);
+      white-space: nowrap;
+    }
+
+    .progressBox {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+      margin-top: 10px;
+    }
+
+    .progress {
+      height: 12px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #d9dfd5;
+    }
+
+    #progressBar {
+      height: 100%;
+      width: 0%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #2a7b4a, #7aa843);
+      transition: width .18s ease;
+    }
+
+    #progressText {
+      min-width: 72px;
+      color: var(--green-dark);
+      font-weight: 900;
+      text-align: right;
+    }
+
+    nav {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 10px 0 2px;
+      scrollbar-width: none;
+    }
+
+    nav::-webkit-scrollbar {
+      display: none;
+    }
+
+    nav a {
+      flex: 0 0 auto;
+      display: inline-flex;
+      align-items: baseline;
+      gap: 6px;
+      padding: 9px 12px;
+      border: 1px solid rgba(115, 130, 110, .28);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--green-dark);
+      font-weight: 850;
+      text-decoration: none;
+      box-shadow: 0 3px 10px rgba(20, 60, 35, .06);
+    }
+
+    nav small {
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    main {
+      padding: 14px 14px 86px;
+    }
+
+    .tools {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin: 0 0 12px;
+    }
+
+    #searchInput {
+      width: 100%;
+      min-height: 46px;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      padding: 0 14px;
+      background: #fff;
+      color: var(--ink);
+      font-size: 1rem;
+      outline: none;
+      box-shadow: var(--shadow);
+    }
+
+    .buttons {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+    }
+
+    button {
+      appearance: none;
+      border: 0;
+      border-radius: 14px;
+      padding: 10px 12px;
+      background: var(--green);
+      color: #fff;
+      font-size: .95rem;
+      font-weight: 900;
+      white-space: nowrap;
+      box-shadow: 0 5px 14px rgba(31, 111, 67, .22);
+      cursor: pointer;
+    }
+
+    button.secondary {
+      background: #fff;
+      color: var(--green-dark);
+      border: 1px solid var(--line);
+      box-shadow: none;
+    }
+
+    .note {
+      margin: 12px 0 18px;
+      padding: 12px 14px;
+      border: 1px solid #e4c460;
+      border-radius: 16px;
+      background: #fff8dc;
+      color: #5b4300;
+      font-weight: 800;
+    }
+
+    section.site {
+      scroll-margin-top: 174px;
+      margin: 18px 0;
+      overflow: hidden;
+      border: 1px solid rgba(115, 130, 110, .24);
+      border-radius: var(--radius);
+      background: var(--card);
+      box-shadow: var(--shadow);
+    }
+
+    .siteHead {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: end;
+      gap: 12px;
+      padding: 15px;
+      background: linear-gradient(135deg, var(--green-dark), var(--green));
+      color: #fff;
+    }
+
+    .siteHead h2 {
+      margin: 0;
+      font-size: 1.35rem;
+      line-height: 1.18;
+    }
+
+    .subtitle {
+      margin-top: 3px;
+      opacity: .88;
+      font-weight: 700;
+    }
+
+    .siteCount {
+      min-width: 92px;
+      padding: 8px 10px;
+      border: 1px solid rgba(255,255,255,.25);
+      border-radius: 13px;
+      background: rgba(255,255,255,.16);
+      text-align: right;
+      font-weight: 950;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 50px minmax(0, 1fr) 86px 34px;
+      gap: 7px;
+      align-items: center;
+      min-height: 58px;
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--line);
+      background: #fff;
+    }
+
+    .row:nth-child(even) {
+      background: #fbfcfa;
+    }
+
+    .row.checked {
+      background: var(--green-soft);
+    }
+
+    .row.checked .bird {
+      color: #536958;
+      text-decoration: line-through;
+    }
+
+    .row.hidden {
+      display: none;
+    }
+
+    .check {
+      width: 30px;
+      height: 30px;
+      accent-color: var(--green);
+    }
+
+    .bird {
+      min-width: 0;
+      overflow-wrap: anywhere;
+      font-size: 1.05rem;
+      font-weight: 900;
+      letter-spacing: .01em;
+    }
+
+    .date {
+      color: var(--muted);
+      font-size: .84rem;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .star {
+      color: var(--star);
+      font-size: 1.45rem;
+      font-weight: 950;
+      line-height: 1;
+      text-align: center;
+    }
+
+    .empty {
+      display: none;
+      padding: 16px;
+      color: var(--muted);
+      font-weight: 800;
+      text-align: center;
+      border-top: 1px solid var(--line);
+    }
+
+    section.noMatch .empty {
+      display: block;
+    }
+
+    .backTop {
+      position: fixed;
+      right: 14px;
+      bottom: max(14px, env(safe-area-inset-bottom));
+      z-index: 60;
+      display: grid;
+      place-items: center;
+      width: 48px;
+      height: 48px;
+      border-radius: 999px;
+      background: var(--green-dark);
+      color: #fff;
+      text-decoration: none;
+      font-size: 1.3rem;
+      font-weight: 900;
+      box-shadow: 0 10px 24px rgba(0,0,0,.18);
+    }
+
+    @media (min-width: 760px) {
+      .tools {
+        grid-template-columns: 1fr auto;
+        align-items: center;
+      }
+
+      .row {
+        grid-template-columns: 58px minmax(180px, 1fr) 132px 50px;
+        min-height: 54px;
+      }
+
+      .date {
+        font-size: .95rem;
+      }
+    }
+
+    @media print {
+      header, .tools, .backTop {
+        display: none;
+      }
+
+      body {
+        background: #fff;
+      }
+
+      main {
+        padding: 0;
+      }
+
+      section.site {
+        box-shadow: none;
+        break-inside: avoid;
+      }
+    }
+  </style>
 </head>
 <body>
-<h1>鳥點鳥種勾選表</h1>
-<p class="note">附註：* 為該鳥點 3 隻以上的鳥。數量已移除，僅以 * 標示。</p>
-"""
+  <header id="top">
+    <div class="wrap">
+      <h1>大雪山鳥點 Checklist</h1>
+      <div class="meta">
+        <span class="pill">鳥點 <strong>7</strong> 個</span>
+        <span class="pill">鳥種紀錄 <strong>216</strong> 筆</span>
+        <span class="pill">勾選會存在本機瀏覽器 LocalStorage</span>
+      </div>
+      <div class="progressBox">
+        <div class="progress" aria-label="完成進度"><div id="progressBar"></div></div>
+        <div id="progressText">0/216</div>
+      </div>
+      <nav aria-label="鳥點快速跳轉">
+        <a href="#dongshi">東勢林業園區<small>0K</small></a>
+<a href="#enguang">恩光靈修營地<small>4K</small></a>
+<a href="#fushan">富山巷<small>14K</small></a>
+<a href="#hengliu">橫流溪<small>15K</small></a>
+<a href="#dasyueshan-road">大雪山林道<small>22K–23.5K</small></a>
+<a href="#anma">鞍馬山莊<small>43K</small></a>
+<a href="#tianchi">小雪山天池<small>50K</small></a>
+      </nav>
+    </div>
+  </header>
 
-for title, spots in groups.items():
-    html_text += f'<section class="sheet"><h2>{html.escape(title)}</h2><div class="grid">'
-    for spot, rows in spots.items():
-        html_text += f'<div class="spot"><h3>{html.escape(spot)}（{len(rows)} 種）</h3>'
-        for bird, date, count in rows:
-            star = "*" if count >= 3 else ""
-            html_text += f'<label class="row"><input type="checkbox"><span>{html.escape(bird)}</span><span class="date">{date}</span><span class="star">{star}</span></label>'
-        html_text += '</div>'
-    html_text += '</div></section>'
-html_text += "</body></html>"
+  <main class="wrap">
+    <div class="tools">
+      <input id="searchInput" type="search" placeholder="搜尋鳥種或鳥點，例如：黃山雀、鴞、天池" autocomplete="off">
+      <div class="buttons">
+        <button type="button" class="secondary" id="showAllBtn">顯示全部</button>
+        <button type="button" class="secondary" id="showUncheckedBtn">只看未勾</button>
+        <button type="button" id="resetBtn">清除勾選</button>
+      </div>
+    </div>
 
-out = Path("/mnt/data/bird_checklist.html")
-out.write_text(html_text, encoding="utf-8")
-out
+    <div class="note">附註：<strong>*</strong> 為該鳥點 3 隻以上的鳥。數量已移除，備註只保留星號。</div>
+
+    <div id="app"></div>
+  </main>
+
+  <a href="#top" class="backTop" aria-label="回到頂端">↑</a>
+
+  <script>
+    const SITES = [{"id":"dongshi","name":"東勢林業園區","subtitle":"0K","birds":[{"name":"臺灣竹雞","date":"2026/4/25","mark":""},{"name":"金背鳩","date":"2026/4/25","mark":""},{"name":"紅鳩","date":"2026/4/25","mark":""},{"name":"珠頸斑鳩","date":"2026/4/25","mark":""},{"name":"紅冠水雞","date":"2026/4/25","mark":"*"},{"name":"小鸊鷉","date":"2026/4/25","mark":"*"},{"name":"夜鷺","date":"2026/4/25","mark":"*"},{"name":"黑冠麻鷺","date":"2026/4/25","mark":""},{"name":"黃頭鷺","date":"2026/4/25","mark":"*"},{"name":"翠鳥","date":"2026/4/25","mark":""},{"name":"五色鳥","date":"2026/4/25","mark":""},{"name":"大卷尾","date":"2026/4/25","mark":""},{"name":"樹鵲","date":"2026/4/25","mark":"*"},{"name":"褐頭鷦鶯","date":"2026/4/25","mark":""},{"name":"家燕","date":"2026/4/25","mark":"*"},{"name":"東方金腰燕","date":"2026/4/25","mark":"*"},{"name":"紅嘴黑鵯","date":"2026/4/25","mark":"*"},{"name":"白頭翁","date":"2026/4/25","mark":"*"},{"name":"斯氏繡眼（綠繡眼）","date":"2026/4/25","mark":"*"},{"name":"家八哥","date":"2026/4/25","mark":""},{"name":"白尾八哥","date":"2026/4/25","mark":"*"},{"name":"鵲鴝","date":"2026/4/25","mark":""},{"name":"白腰鵲鴝","date":"2026/4/25","mark":""},{"name":"灰鶺鴒","date":"2026/4/25","mark":""},{"name":"白鶺鴒","date":"2026/4/25","mark":""},{"name":"小雨燕","date":"2026/4/23","mark":""},{"name":"大白鷺","date":"2026/4/23","mark":""},{"name":"大冠鷲","date":"2026/4/23","mark":""},{"name":"松雀鷹","date":"2026/4/23","mark":""},{"name":"黑枕藍鶲","date":"2026/4/23","mark":""},{"name":"洋燕","date":"2026/4/23","mark":""},{"name":"麻雀","date":"2026/4/23","mark":"*"},{"name":"小白鷺","date":"2026/4/22","mark":""},{"name":"小啄木","date":"2026/4/21","mark":""}]},{"id":"enguang","name":"恩光靈修營地","subtitle":"4K","birds":[{"name":"原鴿","date":"2026/4/29","mark":""},{"name":"紅鳩","date":"2026/4/29","mark":""},{"name":"珠頸斑鳩","date":"2026/4/29","mark":"*"},{"name":"夜鷺","date":"2026/4/29","mark":""},{"name":"黃頭鷺","date":"2026/4/29","mark":"*"},{"name":"大冠鷲","date":"2026/4/29","mark":""},{"name":"五色鳥","date":"2026/4/29","mark":""},{"name":"灰喉山椒鳥","date":"2026/4/29","mark":""},{"name":"綠畫眉","date":"2026/4/29","mark":""},{"name":"黃鸝","date":"2026/4/29","mark":""},{"name":"小卷尾","date":"2026/4/29","mark":"*"},{"name":"黑枕藍鶲","date":"2026/4/29","mark":""},{"name":"樹鵲","date":"2026/4/29","mark":"*"},{"name":"家燕","date":"2026/4/29","mark":"*"},{"name":"紅嘴黑鵯","date":"2026/4/29","mark":"*"},{"name":"白環鸚嘴鵯","date":"2026/4/29","mark":"*"},{"name":"白頭翁","date":"2026/4/29","mark":"*"},{"name":"斯氏繡眼（綠繡眼）","date":"2026/4/29","mark":"*"},{"name":"臺灣畫眉","date":"2026/4/29","mark":""},{"name":"家八哥","date":"2026/4/29","mark":""},{"name":"白腰鵲鴝","date":"2026/4/29","mark":""},{"name":"白腰文鳥","date":"2026/4/29","mark":"*"},{"name":"麻雀","date":"2026/4/29","mark":"*"},{"name":"臺灣竹雞","date":"2026/4/25","mark":""},{"name":"小白鷺","date":"2026/4/25","mark":""},{"name":"松雀鷹","date":"2026/4/25","mark":""},{"name":"翠鳥","date":"2026/4/25","mark":""},{"name":"大卷尾","date":"2026/4/25","mark":"*"},{"name":"東方毛腳燕","date":"2026/4/25","mark":""},{"name":"極北柳鶯","date":"2026/4/25","mark":""},{"name":"小彎嘴","date":"2026/4/25","mark":""},{"name":"金背鳩","date":"2026/4/24","mark":""},{"name":"白腹秧雞","date":"2026/4/24","mark":""},{"name":"東方蜂鷹","date":"2026/4/24","mark":""},{"name":"朱鸝","date":"2026/4/24","mark":""},{"name":"山紅頭","date":"2026/4/24","mark":""},{"name":"頭烏線","date":"2026/4/24","mark":""},{"name":"綠啄花","date":"2026/4/24","mark":""},{"name":"繡眼畫眉","date":"2026/4/20","mark":"*"}]},{"id":"fushan","name":"富山巷","subtitle":"14K","birds":[{"name":"金背鳩","date":"2026/4/26","mark":""},{"name":"大冠鷲","date":"2026/4/26","mark":""},{"name":"鳳頭蒼鷹","date":"2026/4/26","mark":""},{"name":"五色鳥","date":"2026/4/26","mark":"*"},{"name":"灰喉山椒鳥","date":"2026/4/26","mark":"*"},{"name":"綠畫眉","date":"2026/4/26","mark":"*"},{"name":"大卷尾","date":"2026/4/26","mark":""},{"name":"樹鵲","date":"2026/4/26","mark":""},{"name":"巨嘴鴉","date":"2026/4/26","mark":""},{"name":"東方金腰燕","date":"2026/4/26","mark":"*"},{"name":"紅嘴黑鵯","date":"2026/4/26","mark":"*"},{"name":"棕面鶯","date":"2026/4/26","mark":""},{"name":"冠羽畫眉","date":"2026/4/26","mark":"*"},{"name":"斯氏繡眼（綠繡眼）","date":"2026/4/26","mark":""},{"name":"山紅頭","date":"2026/4/26","mark":""},{"name":"小彎嘴","date":"2026/4/26","mark":""},{"name":"頭烏線","date":"2026/4/26","mark":""},{"name":"繡眼畫眉","date":"2026/4/26","mark":"*"},{"name":"紅尾鶲","date":"2026/4/26","mark":""},{"name":"藍腹鷴","date":"2026/4/24","mark":""},{"name":"小雨燕","date":"2026/4/24","mark":""},{"name":"赤腹山雀","date":"2026/4/24","mark":"*"}]},{"id":"hengliu","name":"橫流溪","subtitle":"15K","birds":[{"name":"北方中杜鵑","date":"2026/4/29","mark":""},{"name":"五色鳥","date":"2026/4/29","mark":""},{"name":"灰喉山椒鳥","date":"2026/4/29","mark":""},{"name":"赤腹山雀","date":"2026/4/29","mark":"*"},{"name":"紅嘴黑鵯","date":"2026/4/29","mark":"*"},{"name":"棕面鶯","date":"2026/4/29","mark":"*"},{"name":"頭烏線","date":"2026/4/29","mark":""},{"name":"大冠鷲","date":"2026/4/27","mark":"*"},{"name":"鳳頭蒼鷹","date":"2026/4/27","mark":""},{"name":"樹鵲","date":"2026/4/27","mark":"*"},{"name":"巨嘴鴉","date":"2026/4/27","mark":""},{"name":"洋燕","date":"2026/4/27","mark":""},{"name":"冠羽畫眉","date":"2026/4/27","mark":""},{"name":"山紅頭","date":"2026/4/27","mark":""},{"name":"鉛色水鶇","date":"2026/4/27","mark":""},{"name":"金背鳩","date":"2026/4/26","mark":""},{"name":"黑冠麻鷺","date":"2026/4/26","mark":""},{"name":"繡眼畫眉","date":"2026/4/26","mark":"*"},{"name":"小剪尾","date":"2026/4/26","mark":""},{"name":"白尾鴝","date":"2026/4/26","mark":""},{"name":"白腰文鳥","date":"2026/4/26","mark":"*"},{"name":"臺灣山鷓鴣","date":"2026/4/24","mark":""},{"name":"臺灣竹雞","date":"2026/4/23","mark":"*"},{"name":"灰喉針尾雨燕","date":"2026/4/23","mark":""},{"name":"小雨燕","date":"2026/4/23","mark":""},{"name":"東方毛腳燕","date":"2026/4/23","mark":"*"},{"name":"白耳畫眉","date":"2026/4/21","mark":""},{"name":"林鵰","date":"2026/4/20","mark":""}]},{"id":"dasyueshan-road","name":"大雪山林道","subtitle":"22K–23.5K","birds":[{"name":"藍腹鷴","date":"2026/4/29","mark":""},{"name":"鷹鵑","date":"2026/4/29","mark":""},{"name":"冠羽畫眉","date":"2026/4/29","mark":"*"},{"name":"綠鳩","date":"2026/4/29","mark":""},{"name":"五色鳥","date":"2026/4/29","mark":""},{"name":"青背山雀","date":"2026/4/28","mark":"*"},{"name":"黃山雀","date":"2026/4/28","mark":""},{"name":"白耳畫眉","date":"2026/4/28","mark":"*"},{"name":"臺灣叢樹鶯","date":"2026/4/28","mark":""},{"name":"繡眼畫眉","date":"2026/4/28","mark":"*"},{"name":"黃腹琉璃","date":"2026/4/27","mark":""},{"name":"白尾鴝","date":"2026/4/27","mark":""},{"name":"黃胸青鶲","date":"2026/4/27","mark":""},{"name":"臺灣噪眉","date":"2026/4/27","mark":"*"},{"name":"黃胸藪眉","date":"2026/4/27","mark":""},{"name":"東方毛腳燕","date":"2026/4/26","mark":"*"},{"name":"臺灣白喉噪眉","date":"2026/4/26","mark":"*"},{"name":"紅頭山雀","date":"2026/4/25","mark":"*"},{"name":"臺灣山鷓鴣","date":"2026/4/25","mark":"*"},{"name":"臺灣紫嘯鶇","date":"2026/4/26","mark":""},{"name":"松鴉","date":"2026/4/21","mark":""},{"name":"棕噪眉","date":"2026/4/21","mark":""},{"name":"熊鷹","date":"2026/4/20","mark":""},{"name":"紅胸啄花","date":"2026/4/20","mark":""},{"name":"栗背林鴝","date":"2026/4/21","mark":""}]},{"id":"anma","name":"鞍馬山莊","subtitle":"43K","birds":[{"name":"小啄木","date":"2026/4/30","mark":""},{"name":"青背山雀","date":"2026/4/30","mark":""},{"name":"棕面鶯","date":"2026/4/30","mark":""},{"name":"冠羽畫眉","date":"2026/4/30","mark":"*"},{"name":"白耳畫眉","date":"2026/4/30","mark":""},{"name":"臺灣白喉噪眉","date":"2026/4/30","mark":"*"},{"name":"黃腹琉璃","date":"2026/4/30","mark":""},{"name":"臺灣紫嘯鶇","date":"2026/4/30","mark":""},{"name":"巨嘴鴉","date":"2026/4/30","mark":""},{"name":"紅頭山雀","date":"2026/4/30","mark":"*"},{"name":"茶腹鳾","date":"2026/4/30","mark":""},{"name":"白尾鴝","date":"2026/4/30","mark":""},{"name":"藍腹鷴","date":"2026/4/29","mark":""},{"name":"黃胸藪眉","date":"2026/4/29","mark":""},{"name":"鷹鵑","date":"2026/4/28","mark":""},{"name":"黃嘴角鴞","date":"2026/4/28","mark":""},{"name":"綠啄木","date":"2026/4/28","mark":""},{"name":"煤山雀","date":"2026/4/28","mark":""},{"name":"灰林鴿","date":"2026/4/28","mark":""},{"name":"臺灣山鷓鴣","date":"2026/4/27","mark":""},{"name":"星鴉","date":"2026/4/27","mark":""},{"name":"繡眼畫眉","date":"2026/4/27","mark":""},{"name":"黃胸青鶲","date":"2026/4/27","mark":""},{"name":"五色鳥","date":"2026/4/27","mark":""},{"name":"灰喉山椒鳥","date":"2026/4/26","mark":""},{"name":"棕噪眉","date":"2026/4/26","mark":""},{"name":"黃山雀","date":"2026/4/26","mark":""},{"name":"松鴉","date":"2026/4/25","mark":""},{"name":"深山鶯","date":"2026/4/25","mark":""},{"name":"頭烏線","date":"2026/4/25","mark":"*"},{"name":"褐頭花翼","date":"2026/4/24","mark":""},{"name":"斯氏繡眼（綠繡眼）","date":"2026/4/24","mark":"*"},{"name":"大赤啄木","date":"2026/4/21","mark":""},{"name":"夜鷺","date":"2026/4/20","mark":""},{"name":"山紅頭","date":"2026/4/20","mark":""}]},{"id":"tianchi","name":"小雪山天池","subtitle":"50K","birds":[{"name":"北方中杜鵑","date":"2026/4/29","mark":""},{"name":"青背山雀","date":"2026/4/29","mark":"*"},{"name":"臺灣叢樹鶯","date":"2026/4/29","mark":""},{"name":"深山鶯","date":"2026/4/29","mark":""},{"name":"紅頭山雀","date":"2026/4/29","mark":"*"},{"name":"褐頭花翼","date":"2026/4/29","mark":""},{"name":"冠羽畫眉","date":"2026/4/29","mark":"*"},{"name":"臺灣噪眉","date":"2026/4/29","mark":"*"},{"name":"紋翼畫眉","date":"2026/4/29","mark":"*"},{"name":"黃胸藪眉","date":"2026/4/29","mark":"*"},{"name":"臺灣白眉林鴝","date":"2026/4/29","mark":""},{"name":"栗背林鴝","date":"2026/4/29","mark":"*"},{"name":"煤山雀","date":"2026/4/29","mark":""},{"name":"大冠鷲","date":"2026/4/28","mark":""},{"name":"星鴉","date":"2026/4/28","mark":""},{"name":"臺灣鷦眉","date":"2026/4/28","mark":""},{"name":"白耳畫眉","date":"2026/4/28","mark":""},{"name":"黃腹琉璃","date":"2026/4/28","mark":""},{"name":"黃胸青鶲","date":"2026/4/28","mark":""},{"name":"黑長尾雉","date":"2026/4/28","mark":""},{"name":"松鴉","date":"2026/4/28","mark":""},{"name":"棕面鶯","date":"2026/4/28","mark":""},{"name":"山紅頭","date":"2026/4/28","mark":""},{"name":"繡眼畫眉","date":"2026/4/28","mark":"*"},{"name":"火冠戴菊鳥","date":"2026/4/28","mark":""},{"name":"巨嘴鴉","date":"2026/4/27","mark":""},{"name":"白尾鴝","date":"2026/4/26","mark":""},{"name":"小翼鶇","date":"2026/4/26","mark":""},{"name":"花雀","date":"2026/4/26","mark":""},{"name":"紅胸啄花","date":"2026/4/25","mark":""},{"name":"灰鷽","date":"2026/4/25","mark":""},{"name":"叉尾雨燕","date":"2026/4/21","mark":""},{"name":"綠啄木","date":"2026/4/21","mark":""}]}];
+    const STORAGE_KEY = "dasyueshan-bird-checklist-v2";
+
+    const app = document.getElementById("app");
+    const progressBar = document.getElementById("progressBar");
+    const progressText = document.getElementById("progressText");
+    const searchInput = document.getElementById("searchInput");
+    const showAllBtn = document.getElementById("showAllBtn");
+    const showUncheckedBtn = document.getElementById("showUncheckedBtn");
+    const resetBtn = document.getElementById("resetBtn");
+
+    let checkedMap = loadCheckedMap();
+    let onlyUnchecked = false;
+
+    function loadCheckedMap() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+      } catch (err) {
+        return {};
+      }
+    }
+
+    function saveCheckedMap() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(checkedMap));
+    }
+
+    function makeItemId(siteId, index, birdName) {
+      return `${siteId}__${index}__${birdName}`;
+    }
+
+    function render() {
+      app.innerHTML = SITES.map(site => {
+        const rows = site.birds.map((bird, index) => {
+          const id = makeItemId(site.id, index, bird.name);
+          const checked = Boolean(checkedMap[id]);
+          return `
+            <label class="row ${checked ? "checked" : ""}"
+                   data-id="${id}"
+                   data-site="${site.name}"
+                   data-bird="${bird.name}">
+              <input class="check" type="checkbox" ${checked ? "checked" : ""} aria-label="勾選 ${bird.name}">
+              <span class="bird">${bird.name}</span>
+              <span class="date">${bird.date}</span>
+              <span class="star" aria-label="${bird.mark ? "三隻以上" : ""}">${bird.mark}</span>
+            </label>
+          `;
+        }).join("");
+
+        return `
+          <section class="site" id="${site.id}">
+            <div class="siteHead">
+              <div>
+                <h2>${site.name}</h2>
+                <div class="subtitle">${site.subtitle}</div>
+              </div>
+              <div class="siteCount">
+                <span class="siteDone" data-site-id="${site.id}">0</span> / ${site.birds.length}
+              </div>
+            </div>
+            <div class="table">${rows}</div>
+            <div class="empty">這個鳥點目前沒有符合搜尋條件的鳥種</div>
+          </section>
+        `;
+      }).join("");
+
+      bindCheckboxes();
+      updateProgress();
+      applyFilter();
+    }
+
+    function bindCheckboxes() {
+      document.querySelectorAll(".row").forEach(row => {
+        const checkbox = row.querySelector(".check");
+        checkbox.addEventListener("change", () => {
+          const id = row.dataset.id;
+          if (checkbox.checked) {
+            checkedMap[id] = true;
+          } else {
+            delete checkedMap[id];
+          }
+          row.classList.toggle("checked", checkbox.checked);
+          saveCheckedMap();
+          updateProgress();
+          applyFilter();
+        });
+      });
+    }
+
+    function updateProgress() {
+      let total = 0;
+      let done = 0;
+
+      SITES.forEach(site => {
+        let siteDone = 0;
+
+        site.birds.forEach((bird, index) => {
+          total++;
+          const id = makeItemId(site.id, index, bird.name);
+          if (checkedMap[id]) {
+            done++;
+            siteDone++;
+          }
+        });
+
+        const siteDoneEl = document.querySelector(`.siteDone[data-site-id="${site.id}"]`);
+        if (siteDoneEl) siteDoneEl.textContent = siteDone;
+      });
+
+      const pct = total ? Math.round((done / total) * 100) : 0;
+      progressBar.style.width = `${pct}%`;
+      progressText.textContent = `${done}/${total}`;
+    }
+
+    function applyFilter() {
+      const keyword = searchInput.value.trim().toLowerCase();
+
+      document.querySelectorAll("section.site").forEach(section => {
+        let visibleRows = 0;
+
+        section.querySelectorAll(".row").forEach(row => {
+          const haystack = `${row.dataset.site} ${row.dataset.bird}`.toLowerCase();
+          const matchesKeyword = !keyword || haystack.includes(keyword);
+          const matchesUnchecked = !onlyUnchecked || !row.querySelector(".check").checked;
+          const visible = matchesKeyword && matchesUnchecked;
+
+          row.classList.toggle("hidden", !visible);
+          if (visible) visibleRows++;
+        });
+
+        section.classList.toggle("noMatch", visibleRows === 0);
+      });
+    }
+
+    searchInput.addEventListener("input", applyFilter);
+
+    showAllBtn.addEventListener("click", () => {
+      onlyUnchecked = false;
+      searchInput.value = "";
+      showUncheckedBtn.textContent = "只看未勾";
+      applyFilter();
+    });
+
+    showUncheckedBtn.addEventListener("click", () => {
+      onlyUnchecked = !onlyUnchecked;
+      showUncheckedBtn.textContent = onlyUnchecked ? "取消只看未勾" : "只看未勾";
+      applyFilter();
+    });
+
+    resetBtn.addEventListener("click", () => {
+      if (!confirm("確定要清除所有勾選紀錄嗎？")) return;
+      checkedMap = {};
+      saveCheckedMap();
+      render();
+    });
+
+    render();
+  </script>
+</body>
+</html>
